@@ -1,0 +1,24 @@
+.group {
+  background : #fff;
+  
+  border-radius : 3px;
+  padding : 3px;
+}
+
+.group-title {
+  text-align  : center;
+  font-size   : 16px;
+  font-weight : bold;
+  height : 40px;
+}
+
+.group-body {
+  
+}
+
+.table_drop_spacing {
+  border-collapse: collapse;
+}
+.table_drop_spacing td {
+  padding: 0px;
+}

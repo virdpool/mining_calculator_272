@@ -1,0 +1,27 @@
+{
+  "name": "arweave_block_explorer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "front_dev": "./loop.sh ./src/front_server.coffee --watch",
+    "front_prod": "./loop.sh ./src/front_server.coffee",
+    "back_dev": "./loop.sh ./src/back_server.coffee --watch",
+    "back_prod": "./clear_loop.sh ./src/back_server.coffee"
+  },
+  "keywords": [],
+  "author": "vird",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "dotenv-flow": "^3.2.0",
+    "event_mixin": "github:hu2prod/event_mixin",
+    "express": "^4.17.1",
+    "fy": "github:hu2prod/fy",
+    "lock_mixin": "github:hu2prod/lock_mixin",
+    "minimist": "^1.2.5",
+    "webcom": "github:hu2prod/webcom",
+    "webcom-client-plugin-base": "github:hu2prod/webcom-client-plugin-base",
+    "webcom-engine-vendor": "github:hu2prod/webcom-engine-vendor"
+  }
+}

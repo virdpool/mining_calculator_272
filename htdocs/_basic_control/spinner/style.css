@@ -1,0 +1,27 @@
+.smt-spinner-circle {
+  display: inline-block;
+  position: relative;
+  margin: 3px;
+  margin-right: 8px;
+  border-radius: 50%;
+}
+.smt-spinner {
+  height: 100%;
+  width: 100%;
+  border-radius: 50%;
+  border-right: 2px solid rgba(255,255,255,0.6);
+  border-top: 2px solid blue;
+  border-left: 2px solid blue;
+  border-bottom: 2px solid blue;
+  animation: rotate--spinner 0.8s infinite;
+  animation-timing-function: linear;
+}
+
+@keyframes rotate--spinner {
+  from {
+    transform: rotate(0);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
