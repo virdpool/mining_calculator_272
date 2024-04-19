@@ -138,9 +138,19 @@ module.exports =
                   value : @props.weave_size_tb
                   on_change : @props.on_change_weave_size_tb
                 }
-                rate = @props.weave_size_tb/(@props.network_weave_size/1024**4)
+                total_size_tb = @props.network_weave_size
+                if @props.mode == "hdd"
+                  total_size_tb = 0
+                  for hdd in @props.hdd_config
+                    total_size_tb += hdd.count * hdd.size_tb
+                
+                min_size_tb = Math.min total_size_tb, @props.weave_size_tb
+                rate = min_size_tb/(@props.network_weave_size/1024**4)
                 rate = Math.min rate, 1
-                span " TB (#{(rate*100).toFixed(2)}%)"
+                if total_size_tb > @props.weave_size_tb
+                  span " TB (#{(rate*100).toFixed(2)}%)"
+                else
+                  span " TB (#{(rate*100).toFixed(2)}%) (HDD capacity is not enough to fit all)"
             tr
               th "Network weave size"
               td {colSpan:4}
@@ -148,7 +158,10 @@ module.exports =
           tr
             th {colSpan:5}, "Hashrate"
           tr
-            th "My hashrate"
+            if @props.mode == "hdd"
+              th "My hashrate full:#{@props.full_replica_count} part:#{(@props.part_replica_count*100).toFixed(2)}%"
+            else
+              th "My hashrate"
             td
               Number_input {
                 value     : @props.hashrate

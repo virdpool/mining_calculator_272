@@ -23,6 +23,9 @@ module.exports =
   # only mode hdd
   weave_size_tb   : Math.round (179072611426550 * 0.8)/1024**4
   
+  full_replica_count : 0
+  part_replica_count : 0
+  
   # ###################################################################################################
   #    calculated
   # ###################################################################################################
@@ -226,30 +229,45 @@ module.exports =
     @economics_recalc()
   
   hashrate_recalc_from_hdd : ()->
-    network_partition_count = Math.floor @network_weave_size / 3.6e12
-    weave_rate_max = @weave_size_tb/(network_partition_count * (3.6e12 / 1024**4))
-    weave_rate_max = Math.min weave_rate_max, 1
+    PARTITION_SIZE = (3.6e12 / 1024**4)
     
+    total_size_tb   = 0
     total_read_mb_s = 0
     max_read_mb_s   = 0
     partition_count = 0
     for hdd in @hdd_config
+      total_size_tb   += hdd.count * hdd.size_tb
       max_read_per_hdd = 200 * hdd.size_tb / 4 
       total_read_mb_s += hdd.count * Math.min hdd.read_mb_s, max_read_per_hdd
       max_read_mb_s   += hdd.count * max_read_per_hdd
       partition_count += hdd.count * hdd.size_tb / 4 
     
+    # network max data
+    network_partition_count = Math.floor @network_weave_size / 3.6e12
+    available_network_size_tb = network_partition_count * PARTITION_SIZE
+    
+    # available unique data
+    weave_size_tb  = Math.min @weave_size_tb, total_size_tb, available_network_size_tb
+    available_unique_partition_count = weave_size_tb / PARTITION_SIZE
+    
+    # != @network_weave_size; excluding last incomplete partition
+    weave_rate_max = weave_size_tb/available_network_size_tb
+    weave_rate_max = Math.min weave_rate_max, 1
+    
     # "full". == my full
-    full_replica_count_float = partition_count / network_partition_count
+    full_replica_count_float = total_size_tb / weave_size_tb
     full_replica_count = Math.floor full_replica_count_float
     part_replica_count = full_replica_count_float - full_replica_count
-    weave_rate_part = part_replica_count
+    weave_rate_part = part_replica_count * weave_rate_max
+    
+    @full_replica_count = full_replica_count
+    @part_replica_count = part_replica_count
     
     @hashrate =
       (4 * network_partition_count * weave_rate_max  + 400 * network_partition_count * weave_rate_max  * weave_rate_max ) * full_replica_count +
-      (4 * network_partition_count * weave_rate_part + 400 * network_partition_count * weave_rate_part * weave_rate_part) * part_replica_count
+      (4 * network_partition_count * weave_rate_part + 400 * network_partition_count * weave_rate_part * weave_rate_part)
 
-    @hashrate *= total_read_mb_s/max_read_mb_s    
+    @hashrate *= total_read_mb_s/max_read_mb_s
     
     if @hashrate > 1
       @hashrate = Math.round @hashrate
@@ -288,6 +306,9 @@ module.exports =
         @hashrate = value
         @hashrate_related_recalc()
         @force_update()
+      
+      full_replica_count : @full_replica_count
+      part_replica_count : @part_replica_count
       
       exchange_rate : @exchange_rate
       on_change_exchange_rate : (value)=>
