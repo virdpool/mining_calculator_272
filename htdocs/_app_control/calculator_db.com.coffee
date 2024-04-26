@@ -21,7 +21,7 @@ module.exports =
   include_pool_fee: true
   hdd_config      : []
   # only mode hdd
-  weave_size_tb   : Math.round (179072611426550 * 0.8)/1024**4
+  weave_size_tb   : Math.round (179072611426550 * 0.8)/1000**4
   
   full_replica_count : 0
   part_replica_count : 0
@@ -172,7 +172,7 @@ module.exports =
       while old_max_available_data_size != @state.max_available_data_size
         old_max_available_data_size = @state.max_available_data_size
         for i in [0 ... 4]
-          puts "_update_metrics", @state.max_available_data_size//1024**3
+          puts "_update_metrics", @state.max_available_data_size//1000**3
           @_update_metrics() # cb?
           await setTimeout defer(), 1000
       @set_state
@@ -229,7 +229,7 @@ module.exports =
     @economics_recalc()
   
   hashrate_recalc_from_hdd : ()->
-    PARTITION_SIZE = (3.6e12 / 1024**4)
+    PARTITION_SIZE = (3.6e12 / 1000**4)
     
     total_size_tb   = 0
     total_read_mb_s = 0

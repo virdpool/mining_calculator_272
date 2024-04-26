@@ -145,7 +145,7 @@ module.exports =
                     total_size_tb += hdd.count * hdd.size_tb
                 
                 min_size_tb = Math.min total_size_tb, @props.weave_size_tb
-                rate = min_size_tb/(@props.network_weave_size/1024**4)
+                rate = min_size_tb/(@props.network_weave_size/1000**4)
                 rate = Math.min rate, 1
                 if total_size_tb > @props.weave_size_tb
                   span " TB (#{(rate*100).toFixed(2)}%)"
@@ -154,7 +154,7 @@ module.exports =
             tr
               th "Network weave size"
               td {colSpan:4}
-                (@props.network_weave_size/1024**4).to_format_float_string() + " TB"
+                (@props.network_weave_size/1000**4).to_format_float_string() + " TB"
           tr
             th {colSpan:5}, "Hashrate"
           tr
