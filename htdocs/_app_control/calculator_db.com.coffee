@@ -8,7 +8,7 @@ module.exports =
   pool_fee : 0.04
   blocks_per_day : 24*60*60/129
   stat_block_count : 119
-  network_weave_size : 179072611426550
+  network_weave_size : 181816758935798
   
   # ###################################################################################################
   #    user controllable
@@ -83,6 +83,26 @@ module.exports =
       call_later ()=>
         @economics_recalc() 
         @force_update()
+    @weave_size_update()
+  
+  weave_size_update : ()->
+    await fetch("https://arweave.net/block/current").cb defer(err,res)
+    return perr err if err
+    await res.text().cb defer(err, res)
+    return perr err if err
+    try
+      data = JSON.parse res
+    catch err
+      perr "BAD JSON https://arweave.net/block/current #{res}"
+      return
+
+    value = +data.weave_size
+    if isFinite value
+      @network_weave_size = value
+      @hashrate_related_recalc()
+    else
+      perr data
+      perr "bad value weave_size #{data.weave_size}"
   
   block_data_refresh : (height = @state.height)->
     for i in [0 ... 100]
@@ -132,7 +152,7 @@ module.exports =
           exchange_rate_load_error : true
         return
       res.text().cb (err, res)=>
-        if err                                                                                
+        if err
           @set_state
             exchange_rate_is_loading : false
             exchange_rate_load_error : true
@@ -143,10 +163,10 @@ module.exports =
           @set_state
             exchange_rate_is_loading : false
             exchange_rate_load_error : true
-          perr "BAD JSON binance #{res}"                                                      
+          perr "BAD JSON binance #{res}"
           return
 
-        # value = +data.price                                                                 
+        # value = +data.price
         value = +data.weightedAvgPrice
         if isFinite value
           @set_state
@@ -213,8 +233,8 @@ module.exports =
           else
             @set_state
               max_storage_is_loading : false
-              max_storage_load_error : true                                    
-            perr "bad value v2_index_data_size #{value}"                       
+              max_storage_load_error : true
+            perr "bad value v2_index_data_size #{value}"
         else
           @set_state
             max_storage_is_loading : false

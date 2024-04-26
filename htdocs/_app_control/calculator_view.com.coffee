@@ -24,10 +24,10 @@ module.exports =
             for hdd in @props.hdd_config
               do (hdd)=>
                 total_tb        += hdd.count * hdd.size_tb
-                max_read_per_hdd = 200 * hdd.size_tb / 4 
+                max_read_per_hdd = 200 * hdd.size_tb / 3.6
                 total_read_mb_s += hdd.count * Math.min hdd.read_mb_s, max_read_per_hdd
                 max_read_mb_s   += hdd.count * max_read_per_hdd
-                partition_count += hdd.count * hdd.size_tb / 4 
+                partition_count += hdd.count * hdd.size_tb / 3.6
                 tr
                   td
                     Number_input {
